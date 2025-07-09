@@ -1,5 +1,17 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
+# == Schema Information
+#
+# Table name: jokes
+#
+#  id         :integer          not null, primary key
+#  answer     :string
+#  question   :string
+#  source     :string
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#  source_id  :string
+#
 one:
   question: MyString
   answer: MyString
