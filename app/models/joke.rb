@@ -17,7 +17,5 @@ class Joke < ApplicationRecord
 
   has_one :post, dependent: :destroy
 
-  enum source: {
-    icanhazdadjoke: "icanhazdadjoke"
-  }
+  enum :source, icanhazdadjoke: "icanhazdadjoke"
 end
