@@ -23,6 +23,9 @@ gem "jbuilder"
 # Flexible authentication solution for Rails [https://github.com/heartcombo/devise]
 gem "devise"
 
+# Use Tailwind CSS [https://github.com/rails/tailwindcss-rails]
+gem "tailwindcss-rails"
+
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 

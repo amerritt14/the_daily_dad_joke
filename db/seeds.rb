@@ -12,7 +12,7 @@
 if Rails.env.development?
   admin_email = "admin@dailydadjoke.com"
   admin_password = "password123"
-  
+
   unless User.exists?(email: admin_email)
     User.create!(
       email: admin_email,

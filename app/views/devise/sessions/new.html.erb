@@ -8,18 +8,18 @@
         Enter your credentials to view the jokes
       </p>
     </div>
-    
+
     <%= form_with(model: resource, as: resource_name, url: session_path(resource_name), local: true, class: "mt-8 space-y-6") do |form| %>
       <input type="hidden" name="remember" value="1" />
-      
+
       <div class="rounded-md shadow-sm -space-y-px">
         <div>
           <%= form.label :email, "Email address", class: "sr-only" %>
-          <%= form.email_field :email, autofocus: true, autocomplete: "email", 
+          <%= form.email_field :email, autofocus: true, autocomplete: "email",
               class: "appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm",
               placeholder: "Email address" %>
         </div>
-        
+
         <div>
           <%= form.label :password, class: "sr-only" %>
           <%= form.password_field :password, autocomplete: "current-password",
