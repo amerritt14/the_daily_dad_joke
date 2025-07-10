@@ -24,4 +24,9 @@ Recaptcha.configure do |config|
 
   # Skip verification in test environment
   config.skip_verify_env = ["test"]
+  
+  # Debug info (only in development)
+  if Rails.env.development?
+    Rails.logger.info "reCAPTCHA configured with site_key: #{config.site_key[0..10]}..."
+  end
 end

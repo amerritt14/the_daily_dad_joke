@@ -56,9 +56,9 @@
           <%= form.text_field :website, placeholder: "Leave this field empty", tabindex: -1, autocomplete: "off" %>
         </div>
 
-        <div>
+        <div data-controller="recaptcha">
           <div class="flex justify-center">
-            <%= recaptcha_tags %>
+            <%= recaptcha_tags(theme: 'light', size: 'normal') %>
           </div>
           <p class="mt-1 text-sm text-gray-500 text-center">Please verify that you're not a robot</p>
         </div>
@@ -78,3 +78,45 @@
     </div>
   </div>
 </div>
+
+<script>
+  // Handle reCAPTCHA initialization for Turbo
+  document.addEventListener('DOMContentLoaded', function() {
+    initRecaptcha();
+  });
+
+  document.addEventListener('turbo:render', function() {
+    initRecaptcha();
+  });
+
+  function initRecaptcha() {
+    // Wait for reCAPTCHA script to load
+    var attempts = 0;
+    var maxAttempts = 50; // 5 seconds max
+    
+    function checkAndRender() {
+      attempts++;
+      
+      if (window.grecaptcha && window.grecaptcha.render) {
+        var containers = document.querySelectorAll('.g-recaptcha:not([data-rendered="true"])');
+        containers.forEach(function(container) {
+          var sitekey = container.getAttribute('data-sitekey');
+          if (sitekey) {
+            try {
+              grecaptcha.render(container, {
+                'sitekey': sitekey
+              });
+              container.setAttribute('data-rendered', 'true');
+            } catch (e) {
+              console.warn('reCAPTCHA render failed:', e);
+            }
+          }
+        });
+      } else if (attempts < maxAttempts) {
+        setTimeout(checkAndRender, 100);
+      }
+    }
+    
+    checkAndRender();
+  }
+</script>
