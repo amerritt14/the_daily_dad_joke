@@ -3,8 +3,8 @@
 # Table name: jokes
 #
 #  id         :integer          not null, primary key
-#  answer     :string
-#  question   :string
+#  punchline  :string
+#  prompt     :string
 #  source     :string
 #  created_at :datetime         not null
 #  updated_at :datetime         not null

@@ -10,14 +10,14 @@ class AdminController < ApplicationController
 
   def approve_joke
     joke = Joke.find(params[:id])
-    joke.update!(status: 'approved')
-    redirect_to admin_jokes_path, notice: 'Joke approved!'
+    joke.update!(status: "approved")
+    redirect_to admin_jokes_path, notice: "Joke approved!"
   end
 
   def reject_joke
     joke = Joke.find(params[:id])
-    joke.update!(status: 'rejected')
-    redirect_to admin_jokes_path, notice: 'Joke rejected!'
+    joke.update!(status: "rejected")
+    redirect_to admin_jokes_path, notice: "Joke rejected!"
   end
 
   private

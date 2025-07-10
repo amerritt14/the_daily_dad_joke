@@ -10,10 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_10_120000) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_10_154455) do
   create_table "jokes", force: :cascade do |t|
-    t.string "question", null: false
-    t.string "answer"
+    t.string "prompt", null: false
+    t.string "punchline"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "source"
