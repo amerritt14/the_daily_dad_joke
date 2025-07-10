@@ -4,13 +4,24 @@ Recaptcha.configure do |config|
   # For development, we'll use test keys that always pass
   # In production, use Rails credentials
   if Rails.env.development?
-    config.site_key = "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"  # Test key
+    config.site_key   = "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"  # Test key
+    config.secret_key = "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe"  # Test key
+  elsif Rails.env.test?
+    # Use test keys for test environment
+    config.site_key   = "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"  # Test key
     config.secret_key = "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe"  # Test key
   else
-    config.site_key = Rails.application.credentials.recaptcha[:site_key]
-    config.secret_key = Rails.application.credentials.recaptcha[:secret_key]
+    # Production - use Rails credentials if available
+    if Rails.application.credentials.recaptcha
+      config.site_key   = Rails.application.credentials.recaptcha[:site_key]
+      config.secret_key = Rails.application.credentials.recaptcha[:secret_key]
+    else
+      # Fallback to test keys if credentials not configured
+      config.site_key   = "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
+      config.secret_key = "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe"
+    end
   end
 
   # Skip verification in test environment
-  config.skip_verify_env = [ "test" ]
+  config.skip_verify_env = ["test"]
 end

@@ -8,8 +8,8 @@
     </div>
 
     <div class="bg-white shadow-lg rounded-lg p-8">
-      <%= form_with(model: @joke, local: true, class: "space-y-6") do |form| %>
-        <% if @joke.errors.any? %>
+      <%= form_with(model: joke, local: true, class: "space-y-6") do |form| %>
+        <% if joke.errors.any? %>
           <div class="bg-red-50 border border-red-200 rounded-md p-4">
             <div class="flex">
               <div class="flex-shrink-0">
@@ -23,7 +23,7 @@
                 </h3>
                 <div class="mt-2 text-sm text-red-700">
                   <ul class="list-disc pl-5 space-y-1">
-                    <% @joke.errors.full_messages.each do |message| %>
+                    <% joke.errors.full_messages.each do |message| %>
                       <li><%= message %></li>
                     <% end %>
                   </ul>

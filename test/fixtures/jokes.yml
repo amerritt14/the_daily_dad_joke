@@ -13,9 +13,21 @@
 #  source_id  :string
 #
 one:
-  prompt: MyString
-  punchline: MyString
+  prompt: "Why don't scientists trust atoms?"
+  punchline: "Because they make up everything!"
+  status: "pending"
 
-two:
-  prompt: MyString
-  punchline: MyString
+pending:
+  prompt: "What's the best thing about Switzerland?"
+  punchline: "I don't know, but the flag is a big plus!"
+  status: "pending"
+
+approved:
+  prompt: "What do you call a fake noodle?"
+  punchline: "An impasta!"
+  status: "approved"
+
+rejected:
+  prompt: "Why did the chicken cross the road?"
+  punchline: "This joke is overused"
+  status: "rejected"
