@@ -7,3 +7,18 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
+
+# Create admin user for jokes access
+if Rails.env.development?
+  admin_email = "admin@dailydadjoke.com"
+  admin_password = "password123"
+  
+  unless User.exists?(email: admin_email)
+    User.create!(
+      email: admin_email,
+      password: admin_password,
+      password_confirmation: admin_password
+    )
+    puts "Created admin user: #{admin_email} / #{admin_password}"
+  end
+end
