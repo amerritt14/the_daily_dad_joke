@@ -8,11 +8,32 @@ class JokesController < ApplicationController
 
   def index
     # Admin view - shows all jokes with status for moderation
-    # Order by status: pending first, approved middle, rejected last, then by creation date
-    @jokes = Joke.all.order(
-      Arel.sql("CASE WHEN status = 'pending' THEN 0 WHEN status = 'approved' THEN 1 WHEN status = 'rejected' THEN 2 END"),
-      created_at: :desc
-    )
+    # Default to showing pending jokes, allow filtering by status
+    @filter_status = params[:status] || 'pending'
+    
+    # Get counts for status summary (always show all counts)
+    @pending_count = Joke.pending.count
+    @approved_count = Joke.approved.count
+    @rejected_count = Joke.rejected.count
+    
+    # Filter jokes based on selected status
+    @jokes = case @filter_status
+    when 'pending'
+      Joke.pending
+    when 'approved'
+      Joke.approved
+    when 'rejected'
+      Joke.rejected
+    when 'all'
+      Joke.order(
+        Arel.sql("CASE WHEN status = 'pending' THEN 0 WHEN status = 'approved' THEN 1 WHEN status = 'rejected' THEN 2 END")
+      )
+    else
+      Joke.pending # fallback to pending
+    end
+    
+    # Apply pagination to filtered results
+    @jokes = @jokes.order(created_at: :desc).paginate(page: params[:page], per_page: 12)
   end
 
   def new
@@ -41,9 +62,12 @@ class JokesController < ApplicationController
 
   def update
     if @joke.update(status_params)
-      redirect_to jokes_path, notice: "Joke status updated to #{@joke.status.humanize}."
+      # Preserve the current filter when redirecting
+      redirect_to jokes_path(status: params[:redirect_status] || 'pending'), 
+                  notice: "Joke status updated to #{@joke.status.humanize}."
     else
-      redirect_to jokes_path, alert: "Failed to update joke status."
+      redirect_to jokes_path(status: params[:redirect_status] || 'pending'), 
+                  alert: "Failed to update joke status."
     end
   end
 

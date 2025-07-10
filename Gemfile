@@ -29,6 +29,9 @@ gem "tailwindcss-rails"
 # Google reCAPTCHA for spam prevention [https://github.com/ambethia/recaptcha]
 gem "recaptcha"
 
+# Pagination gem [https://github.com/mislav/will_paginate]
+gem "will_paginate"
+
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 

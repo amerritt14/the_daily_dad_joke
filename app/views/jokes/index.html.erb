@@ -6,74 +6,156 @@
         class: "inline-block bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition duration-200" %>
   </div>
 
-  <% if @jokes.any? %>
-    <!-- Status Summary -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-      <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+  <% if @pending_count > 0 || @approved_count > 0 || @rejected_count > 0 %>
+    <!-- Status Summary with Filter Links -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+      <%= link_to jokes_path(status: 'all'), 
+          class: "block bg-gray-50 p-4 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors duration-200 #{'ring-2 ring-blue-500' if @filter_status == 'all'}" do %>
         <div class="text-center">
-          <p class="text-2xl font-bold text-yellow-800"><%= @jokes.pending.count %></p>
-          <p class="text-yellow-600">Pending Review</p>
-        </div>
-      </div>
-      <div class="bg-green-50 p-4 rounded-lg border border-green-200">
-        <div class="text-center">
-          <p class="text-2xl font-bold text-green-800"><%= @jokes.approved.count %></p>
-          <p class="text-green-600">Approved</p>
-        </div>
-      </div>
-      <div class="bg-red-50 p-4 rounded-lg border border-red-200">
-        <div class="text-center">
-          <p class="text-2xl font-bold text-red-800"><%= @jokes.rejected.count %></p>
-          <p class="text-red-600">Rejected</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-      <% @jokes.each do |joke| %>
-        <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200 <%= 'border-l-4 border-yellow-400' if joke.pending? %>">
-          <div class="mb-4">
-            <div class="flex justify-between items-start mb-2">
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                <%= joke.pending? ? 'bg-yellow-100 text-yellow-800' : '' %>
-                <%= joke.approved? ? 'bg-green-100 text-green-800' : '' %>
-                <%= joke.rejected? ? 'bg-red-100 text-red-800' : '' %>">
-                <%= joke.status.humanize %>
-              </span>
-              <small class="text-gray-500"><%= joke.created_at.strftime("%b %d, %Y") %></small>
-            </div>
-            <h3 class="text-lg font-semibold text-gray-700 mb-2">Q: <%= joke.question %></h3>
-            <p class="text-gray-600">A: <%= joke.answer %></p>
-          </div>
-
-          <% if joke.pending? %>
-            <div class="flex space-x-2 mt-4 pt-4 border-t border-gray-200">
-              <%= form_with model: joke, method: :patch, local: true, class: "inline" do |form| %>
-                <%= form.hidden_field :status, value: "approved" %>
-                <%= form.submit "Approve", 
-                    class: "bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-2 px-4 rounded-md transition duration-200" %>
-              <% end %>
-              
-              <%= form_with model: joke, method: :patch, local: true, class: "inline" do |form| %>
-                <%= form.hidden_field :status, value: "rejected" %>
-                <%= form.submit "Reject", 
-                    class: "bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 px-4 rounded-md transition duration-200" %>
-              <% end %>
-            </div>
-          <% end %>
-
-          <% if joke.source.present? %>
-            <div class="text-sm text-gray-500 mt-4 pt-4 border-t border-gray-200">
-              Source: <%= joke.source %>
-            </div>
-          <% end %>
+          <p class="text-2xl font-bold text-gray-800"><%= @pending_count + @approved_count + @rejected_count %></p>
+          <p class="text-gray-600">All Jokes</p>
         </div>
       <% end %>
+      
+      <%= link_to jokes_path(status: 'pending'), 
+          class: "block bg-yellow-50 p-4 rounded-lg border border-yellow-200 hover:bg-yellow-100 transition-colors duration-200 #{'ring-2 ring-yellow-500' if @filter_status == 'pending'}" do %>
+        <div class="text-center">
+          <p class="text-2xl font-bold text-yellow-800"><%= @pending_count %></p>
+          <p class="text-yellow-600">Pending Review</p>
+        </div>
+      <% end %>
+      
+      <%= link_to jokes_path(status: 'approved'), 
+          class: "block bg-green-50 p-4 rounded-lg border border-green-200 hover:bg-green-100 transition-colors duration-200 #{'ring-2 ring-green-500' if @filter_status == 'approved'}" do %>
+        <div class="text-center">
+          <p class="text-2xl font-bold text-green-800"><%= @approved_count %></p>
+          <p class="text-green-600">Approved</p>
+        </div>
+      <% end %>
+      
+      <%= link_to jokes_path(status: 'rejected'), 
+          class: "block bg-red-50 p-4 rounded-lg border border-red-200 hover:bg-red-100 transition-colors duration-200 #{'ring-2 ring-red-500' if @filter_status == 'rejected'}" do %>
+        <div class="text-center">
+          <p class="text-2xl font-bold text-red-800"><%= @rejected_count %></p>
+          <p class="text-red-600">Rejected</p>
+        </div>
+      <% end %>
+    </div>    
+    <!-- Current Filter Heading -->
+    <div class="text-center mb-6">
+      <h2 class="text-2xl font-semibold text-gray-800">
+        <%= case @filter_status
+            when 'pending' then 'Pending Jokes'
+            when 'approved' then 'Approved Jokes'
+            when 'rejected' then 'Rejected Jokes'
+            when 'all' then 'All Jokes'
+            else 'Pending Jokes'
+            end %>
+      </h2>
     </div>
+
+    <% if @jokes.any? %>
+      <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <% @jokes.each do |joke| %>
+          <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200 <%= 'border-l-4 border-yellow-400' if joke.pending? %>">
+            <div class="mb-4">
+              <div class="flex justify-between items-start mb-2">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                  <%= joke.pending? ? 'bg-yellow-100 text-yellow-800' : '' %>
+                  <%= joke.approved? ? 'bg-green-100 text-green-800' : '' %>
+                  <%= joke.rejected? ? 'bg-red-100 text-red-800' : '' %>">
+                  <%= joke.status.humanize %>
+                </span>
+                <small class="text-gray-500"><%= joke.created_at.strftime("%b %d, %Y") %></small>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-700 mb-2">Q: <%= joke.question %></h3>
+              <p class="text-gray-600">A: <%= joke.answer %></p>
+            </div>
+
+            <% if joke.pending? %>
+              <div class="flex space-x-2 mt-4 pt-4 border-t border-gray-200">
+                <%= form_with model: joke, method: :patch, local: true, class: "inline" do |form| %>
+                  <%= form.hidden_field :status, value: "approved" %>
+                  <%= form.hidden_field :redirect_status, value: @filter_status %>
+                  <%= form.submit "Approve", 
+                      class: "bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-2 px-4 rounded-md transition duration-200" %>
+                <% end %>
+                
+                <%= form_with model: joke, method: :patch, local: true, class: "inline" do |form| %>
+                  <%= form.hidden_field :status, value: "rejected" %>
+                  <%= form.hidden_field :redirect_status, value: @filter_status %>
+                  <%= form.submit "Reject", 
+                      class: "bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 px-4 rounded-md transition duration-200" %>
+                <% end %>
+              </div>
+            <% end %>
+
+            <% if joke.source.present? %>
+              <div class="text-sm text-gray-500 mt-4 pt-4 border-t border-gray-200">
+                Source: <%= joke.source %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>      </div>
+      
+      <!-- Pagination info and controls -->
+      <div class="mt-8">
+        <% if @jokes.respond_to?(:total_entries) && @jokes.total_entries > 0 %>
+          <div class="text-center text-gray-600 mb-4">
+            Showing <%= @jokes.offset + 1 %>-<%= [@jokes.offset + @jokes.per_page, @jokes.total_entries].min %> 
+            of <%= @jokes.total_entries %> 
+            <%= @filter_status == 'all' ? 'jokes' : "#{@filter_status} jokes" %>
+          </div>
+        <% end %>
+        
+        <div class="flex justify-center">
+          <%= will_paginate @jokes, class: "pagination flex space-x-2", 
+              previous_label: "← Previous", 
+              next_label: "Next →",
+              inner_window: 2,
+              outer_window: 1,
+              params: { status: @filter_status } %>
+        </div>
+      </div>
+    <% else %>
+      <div class="text-center py-12">
+        <div class="max-w-md mx-auto">
+          <svg class="h-12 w-12 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.469-1.007-5.931-2.609M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">
+            No <%= @filter_status == 'all' ? '' : @filter_status %> jokes found
+          </h3>
+          <p class="text-gray-500">
+            <%= case @filter_status
+                when 'pending' then "There are no jokes waiting for review."
+                when 'approved' then "No jokes have been approved yet."
+                when 'rejected' then "No jokes have been rejected."
+                when 'all' then "No jokes have been submitted yet."
+                else "There are no jokes to display."
+                end %>
+          </p>
+          <% if @filter_status != 'all' %>
+            <div class="mt-4">
+              <%= link_to "View All Jokes", jokes_path(status: 'all'), 
+                  class: "inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-200" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
   <% else %>
+    <!-- No jokes exist at all -->
     <div class="text-center py-12">
-      <p class="text-xl text-gray-600">No jokes available yet!</p>
-      <p class="text-gray-500 mt-2">Check back later for some dad jokes.</p>
+      <div class="max-w-md mx-auto">
+        <svg class="h-16 w-16 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.469-1.007-5.931-2.609M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        <h3 class="text-xl font-medium text-gray-900 mb-2">No jokes submitted yet!</h3>
+        <p class="text-gray-500 mb-6">Get started by encouraging users to submit their best dad jokes.</p>
+        <%= link_to "View Public Submission Form", new_joke_path, 
+            class: "inline-block bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition duration-200" %>
+      </div>
     </div>
   <% end %>
 </div>
