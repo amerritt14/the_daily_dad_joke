@@ -1,3 +1,5 @@
+require "recaptcha"
+
 Recaptcha.configure do |config|
   # For development, we'll use test keys that always pass
   # In production, use Rails credentials
@@ -10,5 +12,5 @@ Recaptcha.configure do |config|
   end
 
   # Skip verification in test environment
-  config.skip_verify_env = [ "test" ]
+  config.skip_verify_env = ["test"]
 end

@@ -21,6 +21,8 @@
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%# Tailwind CSS CDN for development %>
     <script src="https://cdn.tailwindcss.com"></script>
+    <%# Google reCAPTCHA API %>
+    <%= javascript_include_tag "https://www.google.com/recaptcha/api.js", async: true, defer: true %>
     <%= javascript_importmap_tags %>
   </head>
 
