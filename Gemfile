@@ -26,6 +26,9 @@ gem "devise"
 # Use Tailwind CSS [https://github.com/rails/tailwindcss-rails]
 gem "tailwindcss-rails"
 
+# Google reCAPTCHA for spam prevention [https://github.com/ambethia/recaptcha]
+gem "recaptcha"
+
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 

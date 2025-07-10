@@ -10,14 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_10_000001) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_10_120000) do
   create_table "jokes", force: :cascade do |t|
-    t.string "question"
+    t.string "question", null: false
     t.string "answer"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "source"
     t.string "source_id"
+    t.string "status", default: "pending", null: false
+    t.index ["status"], name: "index_jokes_on_status"
   end
 
   create_table "posts", force: :cascade do |t|

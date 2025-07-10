@@ -17,5 +17,12 @@ class Joke < ApplicationRecord
 
   has_one :post, dependent: :destroy
 
+  # Enums
   enum :source, icanhazdadjoke: "icanhazdadjoke"
+  enum :status, pending: "pending", approved: "approved", rejected: "rejected"
+
+  # Validations
+  validates :question, presence: true, length: { minimum: 10, maximum: 500 }
+  validates :answer, length: { maximum: 500 }
+  validates :status, presence: true
 end
