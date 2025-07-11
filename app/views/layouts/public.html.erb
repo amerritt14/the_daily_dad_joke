@@ -19,8 +19,12 @@
 
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
-    <%# Tailwind CSS CDN for development %>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <%# Tailwind CSS: Use CDN for development, compiled CSS for production %>
+    <% if Rails.env.development? %>
+      <script src="https://cdn.tailwindcss.com"></script>
+    <% else %>
+      <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+    <% end %>
     <%# Google reCAPTCHA API - load synchronously to ensure it's available %>
     <%= javascript_include_tag "https://www.google.com/recaptcha/api.js", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>

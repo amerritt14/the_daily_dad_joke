@@ -119,8 +119,6 @@ recaptcha:
   secret_key: your_secret_key_here
 ```
 
-Get keys from [Google reCAPTCHA Admin Console](https://www.google.com/recaptcha/admin)
-
 #### 2. Rate Limiting
 - **Limit:** 3 submissions per IP per hour
 - **Storage:** Rails cache (memory in development, Redis recommended for production)
@@ -252,6 +250,68 @@ bin/rails server -e production
 - `302` - Redirect (auth required)
 - `422` - Validation error
 - `429` - Rate limited
+
+## Deployment
+
+### Asset Compilation
+
+The application uses Tailwind CSS with proper compilation for production:
+
+```bash
+# Precompile assets (required before deployment)
+bin/rails assets:precompile
+```
+
+The layouts automatically switch between:
+- **Development:** Tailwind CSS CDN (for faster development)
+- **Production:** Compiled CSS assets (for performance and offline capability)
+
+### Kamal Deployment
+
+This app is configured for deployment using Kamal. The deployment configuration is in `config/deploy.yml`.
+
+#### Prerequisites
+1. **Server Setup:** Configure your server IP in `deploy.yml`
+2. **reCAPTCHA Keys:** Add production credentials:
+   ```bash
+   bin/rails credentials:edit --environment production
+   ```
+   Add:
+   ```yaml
+   recaptcha:
+     site_key: your_production_site_key
+     secret_key: your_production_secret_key
+   ```
+3. **Master Key:** Ensure `RAILS_MASTER_KEY` is available in production
+
+#### Deployment Commands
+```bash
+# Setup (first time)
+bin/kamal setup
+
+# Deploy updates
+bin/kamal deploy
+
+# Check logs
+bin/kamal app logs
+
+# Console access
+bin/kamal app exec --interactive --reuse "bin/rails console"
+```
+
+### Environment Variables
+
+Required for production:
+- `RAILS_MASTER_KEY` - For decrypting credentials
+- reCAPTCHA credentials (via Rails credentials)
+
+### Database Migration
+
+For production deployments with schema changes:
+```bash
+# During deployment
+bin/kamal app exec "bin/rails db:migrate"
+```
 
 ## Contributing
 
