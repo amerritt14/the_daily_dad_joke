@@ -3,6 +3,7 @@ class JokesController < ApplicationController
 
   before_action :authenticate_user!, only: [ :index, :update ]
   before_action :rate_limit_submission, only: [ :create ]
+  before_action :joke, only: [ :update ]
   layout "public", only: [ :new, :create ]
 
   def index
@@ -28,8 +29,8 @@ class JokesController < ApplicationController
   end
 
   def create
-    # Check honeypot field, if present show the success message.
-    if params[:joke][:website].present?
+    # Check honeypot field, if present show the success message (to fool bots)
+    if params.dig(:joke, :website).present?
       redirect_to new_joke_path, notice: "Thank you! Your joke has been submitted and is pending review."
       return
     end
@@ -47,9 +48,9 @@ class JokesController < ApplicationController
   end
 
   def update
-    if joke.update(status_params)
+    if @joke.update(status_params)
       redirect_to jokes_path(status: params[:redirect_status] || "pending"),
-        notice: "Joke status updated to #{joke.status.humanize}."
+        notice: "Joke status updated to #{@joke.status.humanize}."
     else
       redirect_to jokes_path(status: params[:redirect_status] || "pending"),
         alert: "Failed to update joke status."

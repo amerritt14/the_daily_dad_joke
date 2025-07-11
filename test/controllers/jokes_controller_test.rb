@@ -33,17 +33,17 @@ class JokesControllerTest < ActionDispatch::IntegrationTest
 
   test "should filter by status parameter" do
     sign_in @user
-    
+
     # Test approved filter
     get jokes_url(status: "approved")
     assert_response :success
     assert_select "h2", text: "Approved Jokes"
-    
+
     # Test rejected filter
     get jokes_url(status: "rejected")
     assert_response :success
     assert_select "h2", text: "Rejected Jokes"
-    
+
     # Test all filter
     get jokes_url(status: "all")
     assert_response :success
@@ -66,7 +66,7 @@ class JokesControllerTest < ActionDispatch::IntegrationTest
     15.times do |i|
       Joke.create!(prompt: "Test prompt #{i}", punchline: "Test punchline #{i}", status: "pending")
     end
-    
+
     get jokes_url
     assert_response :success
     # Check pagination is present
@@ -91,19 +91,19 @@ class JokesControllerTest < ActionDispatch::IntegrationTest
   test "should create joke with valid parameters" do
     # Mock reCAPTCHA verification
     JokesController.any_instance.stubs(:verify_recaptcha).returns(true)
-    
+
     assert_difference("Joke.count") do
-      post jokes_url, params: { 
-        joke: { 
-          prompt: "Why did the chicken cross the road?", 
-          punchline: "To get to the other side!" 
-        } 
+      post jokes_url, params: {
+        joke: {
+          prompt: "Why did the chicken cross the road?",
+          punchline: "To get to the other side!"
+        }
       }
     end
 
     assert_redirected_to new_joke_path
     assert_equal "Thank you! Your joke has been submitted and is pending review.", flash[:notice]
-    
+
     joke = Joke.last
     assert_equal "pending", joke.status
     assert_equal "Why did the chicken cross the road?", joke.prompt
@@ -113,13 +113,13 @@ class JokesControllerTest < ActionDispatch::IntegrationTest
   test "should not create joke with invalid parameters" do
     # Mock reCAPTCHA verification
     JokesController.any_instance.stubs(:verify_recaptcha).returns(true)
-    
+
     assert_no_difference("Joke.count") do
-      post jokes_url, params: { 
-        joke: { 
+      post jokes_url, params: {
+        joke: {
           prompt: "Too short", # Less than 10 characters
-          punchline: "Test punchline" 
-        } 
+          punchline: "Test punchline"
+        }
       }
     end
 
@@ -129,29 +129,29 @@ class JokesControllerTest < ActionDispatch::IntegrationTest
 
   test "should reject joke when honeypot field is filled" do
     assert_no_difference("Joke.count") do
-      post jokes_url, params: { 
-        joke: { 
+      post jokes_url, params: {
+        joke: {
           prompt: "Valid prompt here that is long enough",
           punchline: "Test punchline",
           website: "spam@example.com" # Honeypot field
-        } 
+        }
       }
     end
 
     assert_redirected_to new_joke_path
-    assert_equal "Submission rejected. Please try again.", flash[:alert]
+    assert_equal "Thank you! Your joke has been submitted and is pending review.", flash[:notice]
   end
 
   test "should not create joke when reCAPTCHA fails" do
     # Mock reCAPTCHA verification failure
     JokesController.any_instance.stubs(:verify_recaptcha).returns(false)
-    
+
     assert_no_difference("Joke.count") do
-      post jokes_url, params: { 
-        joke: { 
-          prompt: "Valid prompt here that is long enough", 
-          punchline: "Test punchline" 
-        } 
+      post jokes_url, params: {
+        joke: {
+          prompt: "Valid prompt here that is long enough",
+          punchline: "Test punchline"
+        }
       }
     end
 
@@ -163,7 +163,8 @@ class JokesControllerTest < ActionDispatch::IntegrationTest
     # This test verifies that rate limiting is applied
     # The actual rate limiting logic is tested in the concern
     controller = JokesController.new
-    assert_respond_to controller, :rate_limit_submission
+    assert controller.private_methods.include?(:rate_limit_submission), 
+           "Controller should include rate_limit_submission method"
   end
 
   # Update Action Tests
@@ -174,59 +175,59 @@ class JokesControllerTest < ActionDispatch::IntegrationTest
 
   test "should update joke status when authenticated" do
     sign_in @user
-    
-    patch joke_url(@pending_joke), params: { 
+
+    patch joke_url(@pending_joke), params: {
       joke: { status: "approved" },
       redirect_status: "pending"
     }
-    
+
     assert_redirected_to jokes_path(status: "pending")
     assert_equal "Joke status updated to Approved.", flash[:notice]
-    
+
     @pending_joke.reload
     assert_equal "approved", @pending_joke.status
   end
 
   test "should preserve filter status on update redirect" do
     sign_in @user
-    
+
     # Update from approved filter
-    patch joke_url(@pending_joke), params: { 
+    patch joke_url(@pending_joke), params: {
       joke: { status: "approved" },
       redirect_status: "approved"
     }
-    
+
     assert_redirected_to jokes_path(status: "approved")
   end
 
   test "should handle update failure gracefully" do
     sign_in @user
-    
+
     # Mock update failure
     Joke.any_instance.stubs(:update).returns(false)
-    
-    patch joke_url(@pending_joke), params: { 
+
+    patch joke_url(@pending_joke), params: {
       joke: { status: "approved" },
       redirect_status: "pending"
     }
-    
+
     assert_redirected_to jokes_path(status: "pending")
     assert_equal "Failed to update joke status.", flash[:alert]
   end
 
   test "should only allow status parameter in update" do
     sign_in @user
-    
+
     original_prompt = @pending_joke.prompt
-    
-    patch joke_url(@pending_joke), params: { 
-      joke: { 
+
+    patch joke_url(@pending_joke), params: {
+      joke: {
         status: "approved",
         prompt: "Hacked prompt", # Should be ignored
         punchline: "Hacked punchline" # Should be ignored
       }
     }
-    
+
     @pending_joke.reload
     assert_equal "approved", @pending_joke.status
     assert_equal original_prompt, @pending_joke.prompt # Should be unchanged
@@ -252,17 +253,17 @@ class JokesControllerTest < ActionDispatch::IntegrationTest
   test "should only permit safe joke parameters in create" do
     # Mock reCAPTCHA verification
     JokesController.any_instance.stubs(:verify_recaptcha).returns(true)
-    
-    post jokes_url, params: { 
-      joke: { 
+
+    post jokes_url, params: {
+      joke: {
         prompt: "Valid prompt here that is long enough",
         punchline: "Test punchline",
         status: "approved", # Should be ignored - defaults to pending
         source: "hacker", # Should be ignored
         id: 999 # Should be ignored
-      } 
+      }
     }
-    
+
     joke = Joke.last
     assert_equal "pending", joke.status # Should default to pending
     assert_nil joke.source # Should not be set
@@ -271,24 +272,24 @@ class JokesControllerTest < ActionDispatch::IntegrationTest
   # Error Handling Tests
   test "should handle missing joke gracefully in update" do
     sign_in @user
-    
-    assert_raises(ActiveRecord::RecordNotFound) do
-      patch joke_url(id: 99999), params: { joke: { status: "approved" } }
-    end
+
+    # Test that trying to update a non-existent joke returns 404
+    patch "/jokes/99999", params: { joke: { status: "approved" } }
+    assert_response :not_found
   end
 
   # Content Security Tests
   test "should sanitize joke content" do
     # Mock reCAPTCHA verification
     JokesController.any_instance.stubs(:verify_recaptcha).returns(true)
-    
-    post jokes_url, params: { 
-      joke: { 
+
+    post jokes_url, params: {
+      joke: {
         prompt: "Why did the chicken cross the road? <script>alert('xss')</script>",
         punchline: "To get to the other side! <script>alert('xss')</script>"
-      } 
+      }
     }
-    
+
     joke = Joke.last
     # Rails should automatically escape the content when displayed
     assert_includes joke.prompt, "<script>"
@@ -299,27 +300,27 @@ class JokesControllerTest < ActionDispatch::IntegrationTest
   test "complete joke submission and approval workflow" do
     # Mock reCAPTCHA verification
     JokesController.any_instance.stubs(:verify_recaptcha).returns(true)
-    
+
     # 1. Submit a joke
     assert_difference("Joke.count") do
-      post jokes_url, params: { 
-        joke: { 
-          prompt: "Why don't scientists trust atoms?", 
-          punchline: "Because they make up everything!" 
-        } 
+      post jokes_url, params: {
+        joke: {
+          prompt: "Why don't scientists trust atoms?",
+          punchline: "Because they make up everything!"
+        }
       }
     end
-    
+
     joke = Joke.last
     assert_equal "pending", joke.status
-    
+
     # 2. Admin reviews and approves
     sign_in @user
-    patch joke_url(joke), params: { 
+    patch joke_url(joke), params: {
       joke: { status: "approved" },
       redirect_status: "pending"
     }
-    
+
     joke.reload
     assert_equal "approved", joke.status
   end
