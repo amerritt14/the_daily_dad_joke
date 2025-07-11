@@ -37,13 +37,8 @@ class JokesController < ApplicationController
 
     joke = Joke.new(joke_params)
 
-    # reCAPTCHA v3 verification with score threshold
-    recaptcha_valid = verify_recaptcha(
-      model: joke,
-      action: "submit_joke",
-      minimum_score: 0.5,
-      secret_key: Rails.application.credentials.dig(:recaptcha, :secret_key)
-    )
+    # reCAPTCHA verification
+    recaptcha_valid = verify_recaptcha(model: joke)
 
     if recaptcha_valid && joke.save
       redirect_to new_joke_path, notice: "Thank you! Your joke has been submitted and is pending review."
