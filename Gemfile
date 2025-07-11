@@ -23,8 +23,7 @@ gem "jbuilder"
 # Flexible authentication solution for Rails [https://github.com/heartcombo/devise]
 gem "devise"
 
-# Use Tailwind CSS [https://github.com/rails/tailwindcss-rails]
-gem "tailwindcss-rails"
+# Removed Tailwind CSS dependency
 
 # Google reCAPTCHA for spam prevention [https://github.com/ambethia/recaptcha]
 gem "recaptcha"
@@ -78,7 +77,7 @@ group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
   gem "selenium-webdriver"
-  
+
   # Mocking and stubbing for tests
   gem "mocha"
 end

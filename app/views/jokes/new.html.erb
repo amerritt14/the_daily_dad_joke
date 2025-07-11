@@ -1,66 +1,64 @@
-<div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-  <div class="max-w-2xl mx-auto">
-    <div class="text-center mb-8">
-      <h1 class="text-4xl font-bold text-gray-900 mb-4">Submit a Dad Joke</h1>
-      <p class="text-lg text-gray-600">
+<div class="joke-form-container">
+  <div class="joke-form-wrapper">
+    <div class="joke-form-header">
+      <h1 class="joke-form-title">Submit a Dad Joke</h1>
+      <p class="joke-form-subtitle">
         Got a great dad joke? Share it with the world! All submissions will be reviewed before publication.
       </p>
     </div>
 
-    <div class="bg-white shadow-lg rounded-lg p-8">
-      <%= form_with(model: joke, local: true, class: "space-y-6") do |form| %>
+    <div class="joke-form-card">
+      <%= form_with(model: joke, local: true) do |form| %>
         <% if joke.errors.any? %>
-          <div class="bg-red-50 border border-red-200 rounded-md p-4">
-            <div class="flex">
-              <div class="flex-shrink-0">
-                <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+          <div class="joke-form-error-panel">
+            <div class="joke-form-error-header">
+              <div class="joke-form-error-icon">
+                <svg viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
                 </svg>
               </div>
-              <div class="ml-3">
-                <h3 class="text-sm font-medium text-red-800">
+              <div class="joke-form-error-content">
+                <h3 class="joke-form-error-title">
                   There were some problems with your submission:
                 </h3>
-                <div class="mt-2 text-sm text-red-700">
-                  <ul class="list-disc pl-5 space-y-1">
-                    <% joke.errors.full_messages.each do |message| %>
-                      <li><%= message %></li>
-                    <% end %>
-                  </ul>
-                </div>
+                <ul class="joke-form-error-list">
+                  <% joke.errors.full_messages.each do |message| %>
+                    <li><%= message %></li>
+                  <% end %>
+                </ul>
               </div>
             </div>
           </div>
         <% end %>
 
-        <div>
-          <%= form.label :prompt, "Setup/Prompt", class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <div class="joke-form-group">
+          <%= form.label :prompt, "Setup/Prompt", class: "joke-form-label" %>
           <%= form.text_area :prompt,
-              class: "block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm",
+              class: "joke-form-textarea",
               placeholder: "Why don't scientists trust atoms?",
               rows: 3 %>
-          <p class="mt-1 text-sm text-gray-500">The setup or prompt part of your joke (10-500 characters)</p>
+          <p class="joke-form-help">The setup or prompt part of your joke (10-500 characters)</p>
         </div>
 
-        <div>
-          <%= form.label :punchline, "Punchline", class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <div class="joke-form-group">
+          <%= form.label :punchline, "Punchline", class: "joke-form-label" %>
           <%= form.text_area :punchline,
-              class: "block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm",
+              class: "joke-form-textarea",
               placeholder: "Because they make up everything!",
               rows: 3 %>
-          <p class="mt-1 text-sm text-gray-500">The punchline (optional, max 500 characters)</p>
+          <p class="joke-form-help">The punchline (optional, max 500 characters)</p>
         </div>
 
-        <div>
-          <%= form.label :submitted_by, "Your Name (Optional)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <div class="joke-form-group">
+          <%= form.label :submitted_by, "Your Name (Optional)", class: "joke-form-label" %>
           <%= form.text_field :submitted_by,
-              class: "block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm",
+              class: "joke-form-input",
               placeholder: "Your name or nickname",
               maxlength: 100 %>
-          <p class="mt-1 text-sm text-gray-500">Want credit for your joke? Enter your name (max 100 characters)</p>
+          <p class="joke-form-help">Want credit for your joke? Enter your name (max 100 characters)</p>
         </div>
 
-        <div style="display: none;">
+        <div class="joke-form-honeypot">
           <%= form.text_field :website, tabindex: -1, autocomplete: "off" %>
         </div>
 
@@ -68,15 +66,14 @@
           <%= recaptcha_v3(action: 'submit_joke') %>
         </div>
 
-        <div class="pt-4">
-          <%= form.submit "Submit Joke",
-              class: "w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-200" %>
+        <div class="joke-form-submit-group">
+          <%= form.submit "Submit Joke", class: "joke-form-submit-button" %>
         </div>
       <% end %>
     </div>
 
-    <div class="mt-8 text-center">
-      <p class="text-sm text-gray-500">
+    <div class="joke-form-footer">
+      <p class="joke-form-footer-text">
         By submitting a joke, you agree that it will be reviewed and may be published on this site.
         We reserve the right to edit or reject submissions.
       </p>
