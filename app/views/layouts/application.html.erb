@@ -13,9 +13,8 @@
     <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
     <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
 
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
+    <link rel="icon" href="/tddj-favicon.png" type="image/png">
+    <link rel="apple-touch-icon" href="/tddj-favicon.png">
 
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
@@ -30,10 +29,8 @@
         </h1>
 
         <nav class="site-nav">
-          <%= link_to "Submit a Joke", new_joke_path, class: "nav-link" %>
-
           <% if user_signed_in? %>
-            <span class="user-welcome">Welcome, <%= current_user.email %></span>
+            <span class="user-welcome"><%= current_user.email %></span>
             <%= link_to "Sign out", destroy_user_session_path,
                 data: { turbo_method: :delete },
                 class: "btn btn-danger btn-small" %>

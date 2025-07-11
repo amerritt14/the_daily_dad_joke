@@ -13,9 +13,8 @@
     <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
     <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
 
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
+    <link rel="icon" href="/tddj-favicon.png" type="image/png">
+    <link rel="apple-touch-icon" href="/tddj-favicon.png">
 
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
@@ -28,7 +27,7 @@
     <header class="site-header">
       <div class="container">
         <h1 class="site-title">
-          <%= link_to "The Daily Dad Joke", new_joke_path, class: "site-title-link" %>
+          <%= link_to "The Daily Dad Joke", "https://thedailydadjoke.com", class: "site-title-link" %>
         </h1>
 
         <nav class="site-nav">
