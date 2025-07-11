@@ -22,5 +22,6 @@ class Joke < ApplicationRecord
 
   validates :prompt, presence: true, length: { minimum: 10, maximum: 500 }
   validates :punchline, length: { maximum: 500 }
+  validates :submitted_by, length: { maximum: 100 }
   validates :status, presence: true
 end

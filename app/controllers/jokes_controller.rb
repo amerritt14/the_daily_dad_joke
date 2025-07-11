@@ -85,7 +85,7 @@ class JokesController < ApplicationController
   end
 
   def joke_params
-    params.require(:joke).permit(:prompt, :punchline)
+    params.require(:joke).permit(:prompt, :punchline, :submitted_by)
   end
 
   def status_params

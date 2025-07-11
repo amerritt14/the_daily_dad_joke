@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_10_154455) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_11_013725) do
   create_table "jokes", force: :cascade do |t|
     t.string "prompt", null: false
     t.string "punchline"
@@ -19,6 +19,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_10_154455) do
     t.string "source"
     t.string "source_id"
     t.string "status", default: "pending", null: false
+    t.string "submitted_by"
     t.index ["status"], name: "index_jokes_on_status"
   end
 
