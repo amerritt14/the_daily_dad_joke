@@ -25,8 +25,8 @@
     <% else %>
       <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <% end %>
-    <%# Google reCAPTCHA API - load synchronously to ensure it's available %>
-    <%= javascript_include_tag "https://www.google.com/recaptcha/api.js", "data-turbo-track": "reload" %>
+    <%# Google reCAPTCHA v3 API %>
+    <%= javascript_include_tag "https://www.google.com/recaptcha/api.js?render=#{Rails.application.credentials.dig(:recaptcha, :site_key) || '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'}", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 

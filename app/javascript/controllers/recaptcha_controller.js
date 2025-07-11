@@ -3,39 +3,34 @@ import { Controller } from "@hotwired/stimulus"
 // Connects to data-controller="recaptcha"
 export default class extends Controller {
   connect() {
-    // Initialize reCAPTCHA when the controller connects
-    this.initializeRecaptcha()
-    
-    // Listen for Turbo events to reinitialize reCAPTCHA
-    document.addEventListener("turbo:render", this.initializeRecaptcha.bind(this))
+    // reCAPTCHA v3 doesn't need manual initialization like v2
+    // The token is generated when the form is submitted
+    console.log("reCAPTCHA v3 controller connected")
   }
 
-  disconnect() {
-    // Clean up event listener when controller disconnects
-    document.removeEventListener("turbo:render", this.initializeRecaptcha.bind(this))
-  }
-
-  initializeRecaptcha() {
-    // Wait a bit for the reCAPTCHA script to load
-    setTimeout(() => {
-      if (window.grecaptcha && window.grecaptcha.render) {
-        // Find all reCAPTCHA containers that haven't been rendered yet
-        const recaptchaContainers = document.querySelectorAll('.g-recaptcha:not([data-rendered])')
-        
-        recaptchaContainers.forEach(container => {
-          const siteKey = container.getAttribute('data-sitekey')
-          if (siteKey) {
-            try {
-              window.grecaptcha.render(container, {
-                'sitekey': siteKey
-              })
-              container.setAttribute('data-rendered', 'true')
-            } catch (error) {
-              console.warn('Failed to render reCAPTCHA:', error)
-            }
-          }
+  // This method can be called when form is submitted to get a fresh token
+  async getToken(action = 'submit') {
+    if (window.grecaptcha && window.grecaptcha.ready) {
+      return new Promise((resolve) => {
+        window.grecaptcha.ready(() => {
+          window.grecaptcha.execute(this.getSiteKey(), { action: action }).then((token) => {
+            resolve(token)
+          })
         })
+      })
+    }
+    return null
+  }
+
+  getSiteKey() {
+    // Get site key from the script tag or use test key
+    const scripts = document.querySelectorAll('script[src*="recaptcha"]')
+    for (let script of scripts) {
+      const match = script.src.match(/render=([^&]+)/)
+      if (match) {
+        return match[1]
       }
-    }, 100)
+    }
+    return '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI' // fallback test key
   }
 }

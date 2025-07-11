@@ -37,11 +37,19 @@ class JokesController < ApplicationController
 
     joke = Joke.new(joke_params)
 
-    if verify_recaptcha(model: joke) && joke.save
+    # reCAPTCHA v3 verification with score threshold
+    recaptcha_valid = verify_recaptcha(
+      model: joke,
+      action: "submit_joke",
+      minimum_score: 0.5,
+      secret_key: Rails.application.credentials.dig(:recaptcha, :secret_key)
+    )
+
+    if recaptcha_valid && joke.save
       redirect_to new_joke_path, notice: "Thank you! Your joke has been submitted and is pending review."
     else
-      unless verify_recaptcha(model: joke)
-        joke.errors.add(:base, "Please complete the reCAPTCHA verification.")
+      unless recaptcha_valid
+        joke.errors.add(:base, "Security verification failed. Please try again.")
       end
       render :new, status: :unprocessable_entity, locals: { joke: joke }
     end

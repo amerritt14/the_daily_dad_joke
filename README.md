@@ -104,9 +104,11 @@ User.create!(
 
 ### Multi-Layer Protection System
 
-#### 1. Google reCAPTCHA v2
+#### 1. Google reCAPTCHA v3
 - **Development:** Uses test keys (always pass)
 - **Production:** Requires real keys via Rails credentials
+- **Score-based:** Invisible verification with minimum score threshold (0.5)
+- **Action-specific:** Uses 'submit_joke' action for better analytics
 
 ##### Setup for Production:
 ```bash
@@ -135,7 +137,9 @@ recaptcha:
 
 ### Testing Protection
 All protections are active in development:
-- reCAPTCHA shows but uses test keys
+- reCAPTCHA v3 runs invisibly with test keys
+- Rate limiting enforced
+- Honeypot protection active
 - Rate limiting enforced
 - Honeypot protection active
 
