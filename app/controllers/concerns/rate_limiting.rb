@@ -4,7 +4,7 @@ module RateLimiting
   private
 
   def rate_limit_submission
-    # Allow only 10 submissions per IP per hour (increased from 3)
+    # Allow only 10 submissions per IP per 10 minutes (increased from 3 per hour)
     key = "joke_submissions:#{request.remote_ip}"
     count = Rails.cache.read(key) || 0
 
