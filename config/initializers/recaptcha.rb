@@ -15,10 +15,12 @@ Recaptcha.configure do |config|
     if Rails.application.credentials.recaptcha
       config.site_key   = Rails.application.credentials.recaptcha[:site_key]
       config.secret_key = Rails.application.credentials.recaptcha[:secret_key]
+      Rails.logger.info "reCAPTCHA configured from credentials" if Rails.env.production?
     else
       # Fallback to test keys if credentials not configured
       config.site_key   = "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
       config.secret_key = "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe"
+      Rails.logger.warn "reCAPTCHA using fallback test keys - credentials not found!" if Rails.env.production?
     end
   end
 
