@@ -61,11 +61,8 @@ bin/rails db:create
 bin/rails db:migrate
 bin/rails db:seed
 
-# Assets (Tailwind CSS)
-bin/rails tailwindcss:build
-
 # Start development server
-bin/dev  # Runs Rails + Tailwind watcher
+bin/dev  # Runs Rails
 # OR
 bin/rails server  # Rails only
 ```
@@ -98,4 +95,4 @@ bin/rubocop
 
 ---
 
-**Built with Rails 8, Tailwind CSS, and ❤️ for dad jokes everywhere!**
+**Built with Rails 8 and ❤️ for dad jokes everywhere!**
