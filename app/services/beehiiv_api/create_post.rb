@@ -59,7 +59,7 @@ module BeehiivApi
         blocks: generate_content_blocks,
         status: "confirmed",
         scheduled_at: Time.current.utc.tomorrow.change(hour: 15, min: 0, sec: 0), # Schedule for 10 AM EST
-        recipients: { web: {}, email: {} }
+        recipients: { web: { tier_ids: [ "free" ] }, email: { tier_ids: [ "free" ] } }
       }
     end
 
