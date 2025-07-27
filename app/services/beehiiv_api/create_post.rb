@@ -57,8 +57,9 @@ module BeehiivApi
         title: "Daily Dad Joke - #{Date.current.strftime('%B %d, %Y')}",
         subtitle: joke.prompt.truncate(80),
         blocks: generate_content_blocks,
-        status: "draft",
-        schedule_at: Time.current.utc.tomorrow.change(hour: 15, min: 0, sec: 0) # Schedule for 10 AM EST
+        status: "confirmed",
+        scheduled_at: Time.current.utc.tomorrow.change(hour: 15, min: 0, sec: 0), # Schedule for 10 AM EST
+        recipients: { web: {}, email: {} }
       }
     end
 

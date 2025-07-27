@@ -2,10 +2,10 @@ production:
   daily_beehiiv_post:
     class: CreateDailyBeehiivPostJob
     queue: default
-    schedule: at 9am every day
+    schedule: "0 14 * * *"
 
 development:
   daily_beehiiv_post:
     class: CreateDailyBeehiivPostJob
     queue: default
-    schedule: at 9am every day
+    schedule: "0 14 * * *"
