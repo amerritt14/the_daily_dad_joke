@@ -3,9 +3,19 @@ production:
     class: CreateDailyBeehiivPostJob
     queue: default
     schedule: "0 14 * * *"
+  
+  admin_summary_email:
+    class: SendAdminSummaryEmailsJob
+    queue: default
+    schedule: "0 1 * * *"
 
 development:
   daily_beehiiv_post:
     class: CreateDailyBeehiivPostJob
     queue: default
     schedule: "0 14 * * *"
+  
+  admin_summary_email:
+    class: SendAdminSummaryEmailsJob
+    queue: default
+    schedule: "0 1 * * *"

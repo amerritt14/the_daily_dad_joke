@@ -1,0 +1,50 @@
+DAILY DAD JOKE ADMIN SUMMARY
+============================
+<%= Date.current.strftime('%B %d, %Y') %>
+
+Hello <%= @user.email %>!
+
+Here's your daily summary of joke submissions for The Daily Dad Joke.
+
+CURRENT STATISTICS
+------------------
+⏳ Pending Review: <%= @pending_count %>
+✅ Approved: <%= @approved_count %>
+❌ Rejected: <%= @rejected_count %>
+📈 Total Jokes: <%= @total_count %>
+
+<% if @pending_count > 0 %>
+RECENT PENDING JOKES (Last <%= @recent_pending_jokes.count %>)
+<%= "=" * 50 %>
+
+<% @recent_pending_jokes.each_with_index do |joke, index| %>
+Joke #<%= joke.id %> - Submitted <%= time_ago_in_words(joke.created_at) %> ago
+"<%= joke.prompt %>"
+<% if joke.punchline.present? %>
+"<%= joke.punchline %>"
+<% end %>
+<% if joke.submitted_by.present? %>
+Submitted by: <%= joke.submitted_by %>
+<% end %>
+
+<% unless index == @recent_pending_jokes.count - 1 %>
+---
+
+<% end %>
+<% end %>
+
+ACTION NEEDED
+-------------
+🔍 Review pending jokes at: https://app.thedailydadjoke.com/jokes
+
+<% else %>
+🎉 ALL CAUGHT UP!
+No jokes pending review at this time.
+
+<% end %>
+
+--
+This is an automated email from The Daily Dad Joke admin system.
+You're receiving this because you're an administrator.
+
+© <%= Date.current.year %> The Daily Dad Joke. Making the world smile, one dad joke at a time. 😄

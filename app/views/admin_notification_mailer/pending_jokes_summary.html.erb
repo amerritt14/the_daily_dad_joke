@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Daily Dad Joke Admin Summary</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f4f4;">
+    <tr>
+      <td align="center">
+        <!-- Main Container -->
+        <table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; margin: 20px auto; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+          
+          <!-- Header -->
+          <tr>
+            <td style="background-color: #2563eb; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
+              <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: bold;">
+                📧 Daily Dad Joke Admin Summary
+              </h1>
+              <p style="color: #e0e7ff; margin: 10px 0 0 0; font-size: 16px;">
+                <%= Date.current.strftime('%B %d, %Y') %>
+              </p>
+            </td>
+          </tr>
+
+          <!-- Greeting -->
+          <tr>
+            <td style="padding: 30px 30px 20px 30px;">
+              <h2 style="color: #1f2937; margin: 0 0 15px 0; font-size: 22px;">
+                Hello <%= @user.email %>! 👋
+              </h2>
+              <p style="color: #4b5563; margin: 0; font-size: 16px; line-height: 1.5;">
+                Here's your daily summary of joke submissions for The Daily Dad Joke.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Stats Summary -->
+          <tr>
+            <td style="padding: 0 30px 20px 30px;">
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; border-radius: 6px; border: 1px solid #e5e7eb;">
+                <tr>
+                  <td style="padding: 20px;">
+                    <h3 style="color: #1f2937; margin: 0 0 15px 0; font-size: 18px;">
+                      📊 Current Statistics
+                    </h3>
+                    
+                    <!-- Stats Table -->
+                    <table border="0" cellpadding="8" cellspacing="0" width="100%" style="border-collapse: collapse;">
+                      <tr style="background-color: #ffffff;">
+                        <td style="border: 1px solid #d1d5db; padding: 12px; font-weight: bold; color: #374151;">Status</td>
+                        <td style="border: 1px solid #d1d5db; padding: 12px; font-weight: bold; color: #374151;">Count</td>
+                      </tr>
+                      <tr style="background-color: <%= @pending_count > 0 ? '#fef3c7' : '#f9fafb' %>;">
+                        <td style="border: 1px solid #d1d5db; padding: 12px; color: #92400e;">
+                          ⏳ Pending Review
+                        </td>
+                        <td style="border: 1px solid #d1d5db; padding: 12px; color: #92400e; font-weight: bold; font-size: 18px;">
+                          <%= @pending_count %>
+                        </td>
+                      </tr>
+                      <tr style="background-color: #f0fdf4;">
+                        <td style="border: 1px solid #d1d5db; padding: 12px; color: #166534;">
+                          ✅ Approved
+                        </td>
+                        <td style="border: 1px solid #d1d5db; padding: 12px; color: #166534; font-weight: bold;">
+                          <%= @approved_count %>
+                        </td>
+                      </tr>
+                      <tr style="background-color: #fef2f2;">
+                        <td style="border: 1px solid #d1d5db; padding: 12px; color: #dc2626;">
+                          ❌ Rejected
+                        </td>
+                        <td style="border: 1px solid #d1d5db; padding: 12px; color: #dc2626; font-weight: bold;">
+                          <%= @rejected_count %>
+                        </td>
+                      </tr>
+                      <tr style="background-color: #f3f4f6;">
+                        <td style="border: 1px solid #d1d5db; padding: 12px; color: #374151; font-weight: bold;">
+                          📈 Total Jokes
+                        </td>
+                        <td style="border: 1px solid #d1d5db; padding: 12px; color: #374151; font-weight: bold;">
+                          <%= @total_count %>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <% if @pending_count > 0 %>
+          <!-- Recent Pending Jokes -->
+          <tr>
+            <td style="padding: 0 30px 20px 30px;">
+              <h3 style="color: #1f2937; margin: 0 0 15px 0; font-size: 18px;">
+                🔍 Recent Pending Jokes (Last <%= @recent_pending_jokes.count %>)
+              </h3>
+              
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #fffbeb; border-radius: 6px; border: 1px solid #f59e0b;">
+                <tr>
+                  <td style="padding: 20px;">
+                    <% @recent_pending_jokes.each_with_index do |joke, index| %>
+                      <div style="<%= 'border-bottom: 1px solid #fed7aa; padding-bottom: 15px; margin-bottom: 15px;' unless index == @recent_pending_jokes.count - 1 %>">
+                        <p style="margin: 0 0 5px 0; color: #92400e; font-weight: bold; font-size: 14px;">
+                          Joke #<%= joke.id %> - Submitted <%= time_ago_in_words(joke.created_at) %> ago
+                        </p>
+                        <p style="margin: 0 0 5px 0; color: #451a03; font-size: 16px; line-height: 1.4;">
+                          "<%= joke.prompt %>"
+                        </p>
+                        <% if joke.punchline.present? %>
+                          <p style="margin: 0 0 5px 0; color: #451a03; font-size: 16px; line-height: 1.4; font-style: italic;">
+                            "<%= joke.punchline %>"
+                          </p>
+                        <% end %>
+                        <% if joke.submitted_by.present? %>
+                          <p style="margin: 0; color: #a16207; font-size: 14px;">
+                            Submitted by: <%= joke.submitted_by %>
+                          </p>
+                        <% end %>
+                      </div>
+                    <% end %>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <% end %>
+
+          <!-- Action Button -->
+          <tr>
+            <td style="padding: 0 30px 30px 30px; text-align: center;">
+              <% if @pending_count > 0 %>
+                <a href="https://app.thedailydadjoke.com/jokes" style="display: inline-block; background-color: #2563eb; color: #ffffff; text-decoration: none; padding: 15px 30px; border-radius: 6px; font-weight: bold; font-size: 16px; margin-top: 10px;">
+                  🔍 Review Pending Jokes
+                </a>
+              <% else %>
+                <div style="background-color: #ecfdf5; color: #065f46; padding: 15px 30px; border-radius: 6px; font-weight: bold; font-size: 16px; margin-top: 10px; border: 2px solid #10b981;">
+                  🎉 All caught up! No jokes pending review.
+                </div>
+              <% end %>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #f9fafb; padding: 20px 30px; text-align: center; border-radius: 0 0 8px 8px; border-top: 1px solid #e5e7eb;">
+              <p style="color: #6b7280; margin: 0; font-size: 14px;">
+                This is an automated email from The Daily Dad Joke admin system.<br/>
+                You're receiving this because you're an administrator.
+              </p>
+              <p style="color: #9ca3af; margin: 10px 0 0 0; font-size: 12px;">
+                © <%= Date.current.year %> The Daily Dad Joke. Making the world smile, one dad joke at a time. 😄
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

@@ -48,3 +48,68 @@ namespace :beehiiv do
     end
   end
 end
+
+namespace :admin do
+  desc "Send admin summary emails to all users"
+  task :send_summary_emails => :environment do
+    begin
+      SendAdminSummaryEmailsJob.perform_now
+      puts "✅ Admin summary emails job completed successfully!"
+    rescue StandardError => e
+      puts "❌ Error running admin summary emails job: #{e.message}"
+      exit 1
+    end
+  end
+
+  desc "Send test admin summary email to a specific user"
+  task :send_test_email, [:email] => :environment do |t, args|
+    email = args[:email]
+    
+    if email.blank?
+      puts "Error: Email address is required"
+      puts "Usage: rails admin:send_test_email[user@example.com]"
+      exit 1
+    end
+
+    user = User.find_by(email: email)
+    unless user
+      puts "❌ User with email '#{email}' not found"
+      exit 1
+    end
+
+    begin
+      AdminNotificationMailer.pending_jokes_summary(user).deliver_now
+      puts "✅ Test admin summary email sent to #{email}"
+    rescue StandardError => e
+      puts "❌ Error sending test email: #{e.message}"
+      exit 1
+    end
+  end
+
+  desc "Preview admin summary email stats"
+  task :preview_summary => :environment do
+    pending_count = Joke.pending.count
+    approved_count = Joke.approved.count
+    rejected_count = Joke.rejected.count
+    total_count = Joke.count
+    user_count = User.count
+
+    puts "📊 Admin Summary Preview"
+    puts "========================"
+    puts "Users who will receive emails: #{user_count}"
+    puts "Pending jokes: #{pending_count}"
+    puts "Approved jokes: #{approved_count}"
+    puts "Rejected jokes: #{rejected_count}"
+    puts "Total jokes: #{total_count}"
+    puts
+    
+    if pending_count > 0
+      puts "Recent pending jokes:"
+      Joke.pending.order(created_at: :desc).limit(3).each do |joke|
+        puts "- #{joke.prompt.truncate(60)} (#{time_ago_in_words(joke.created_at)} ago)"
+      end
+    else
+      puts "🎉 No pending jokes to review!"
+    end
+  end
+end
