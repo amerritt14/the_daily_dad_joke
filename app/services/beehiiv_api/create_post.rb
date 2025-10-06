@@ -54,13 +54,17 @@ module BeehiivApi
 
     def build_post_payload
       {
-        title: "Daily Dad Joke - #{Date.current.strftime('%B %d, %Y')}",
+        title: "Daily Dad Joke - #{scheduled_at.strftime('%B %d, %Y')}",
         subtitle: joke.prompt.truncate(80),
         blocks: generate_content_blocks,
         status: "confirmed",
-        scheduled_at: Time.current.utc.tomorrow.change(hour: 15, min: 0, sec: 0), # Schedule for 10 AM EST
+        scheduled_at: scheduled_at,
         recipients: { web: { tier_ids: [ "free" ] }, email: { tier_ids: [ "free" ] } }
       }
+    end
+
+    def scheduled_at
+      @scheduled_at ||= Time.current.utc.tomorrow.change(hour: 15, min: 0, sec: 0) # Schedule for 10 AM EST
     end
 
     def generate_content_blocks
