@@ -64,7 +64,9 @@ module BeehiivApi
     end
 
     def scheduled_at
-      @scheduled_at ||= Time.current.utc.tomorrow.change(hour: 15, min: 0, sec: 0) # Schedule for 10 AM EST
+      @scheduled_at ||= Time.use_zone("Eastern Time (US & Canada)") do
+        Time.zone.tomorrow.change(hour: 10, min: 0, sec: 0)
+      end
     end
 
     def generate_content_blocks
