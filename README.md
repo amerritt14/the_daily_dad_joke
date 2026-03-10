@@ -5,6 +5,7 @@ A Rails application for collecting and moderating dad jokes with robust spam pro
 ## Table of Contents
 
 - [Quick Start](#quick-start)
+- [Deployment](#deployment)
 - [Contributing](#contributing)
 
 ## Quick Start
@@ -66,6 +67,43 @@ bin/dev  # Runs Rails
 # OR
 bin/rails server  # Rails only
 ```
+
+## Deployment
+
+This app is deployed using [Kamal](https://kamal-deploy.org/) to `app.thedailydadjoke.com`.
+
+### Prerequisites
+- Docker installed locally
+- SSH access to the production server
+- `RAILS_MASTER_KEY` available in `.kamal/secrets`
+
+### Deploy
+
+```bash
+# First-time setup (provisions server, configures proxy, etc.)
+bin/kamal setup
+
+# Deploy a new version
+bin/kamal deploy
+```
+
+### Useful Aliases
+
+```bash
+bin/kamal console   # Open a Rails console on the server
+bin/kamal shell     # Open a bash shell on the server
+bin/kamal logs      # Tail application logs
+bin/kamal dbc       # Open a database console on the server
+```
+
+### Configuration
+
+Deployment is configured in [config/deploy.yml](config/deploy.yml). Key settings:
+- **Host:** `app.thedailydadjoke.com` (SSL enabled)
+- **Registry:** `localhost:5555`
+- **Storage:** Persistent volume at `/data` for SQLite and Active Storage files
+
+---
 
 ## Contributing
 
