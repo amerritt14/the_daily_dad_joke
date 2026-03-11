@@ -64,7 +64,7 @@ module BeehiivApi
     end
 
     def scheduled_at
-      @scheduled_at ||= ActiveSupport::TimeZone["Eastern Time (US & Canada)"].tomorrow.change(hour: 10, min: 0, sec: 0)
+      @scheduled_at ||= ActiveSupport::TimeZone["Eastern Time (US & Canada)"].now.tomorrow.change(hour: 10, min: 0, sec: 0)
     end
 
     def generate_content_blocks
