@@ -58,15 +58,13 @@ module BeehiivApi
         subtitle: joke.prompt.truncate(80),
         blocks: generate_content_blocks,
         status: "confirmed",
-        scheduled_at: scheduled_at,
+        scheduled_at: scheduled_at.iso8601,
         recipients: { web: { tier_ids: [ "free" ] }, email: { tier_ids: [ "free" ] } }
       }
     end
 
     def scheduled_at
-      @scheduled_at ||= Time.use_zone("Eastern Time (US & Canada)") do
-        Time.zone.tomorrow.change(hour: 10, min: 0, sec: 0)
-      end
+      @scheduled_at ||= ActiveSupport::TimeZone["Eastern Time (US & Canada)"].tomorrow.change(hour: 10, min: 0, sec: 0)
     end
 
     def generate_content_blocks
