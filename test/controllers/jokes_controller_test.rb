@@ -237,6 +237,29 @@ class JokesControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Joke could not be updated.", flash[:alert]
   end
 
+  test "should delete rejected joke" do
+    sign_in @user
+    assert_difference("Joke.count", -1) do
+      delete joke_url(@rejected_joke), params: { redirect_status: "rejected" }
+    end
+    assert_redirected_to jokes_path(status: "rejected")
+  end
+
+  test "should not delete non-rejected joke" do
+    sign_in @user
+    assert_no_difference("Joke.count") do
+      delete joke_url(@approved_joke)
+    end
+    assert_equal "Only rejected jokes can be deleted.", flash[:alert]
+  end
+
+  test "should redirect to sign in for delete when not authenticated" do
+    assert_no_difference("Joke.count") do
+      delete joke_url(@rejected_joke)
+    end
+    assert_redirected_to new_user_session_path
+  end
+
   test "should render inline edit form on each card" do
     sign_in @user
     get jokes_url(status: "pending")

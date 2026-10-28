@@ -136,6 +136,9 @@
                   <%= form.submit "Reject", class: "btn btn-danger" %>
                 <% end %>
               <% end %>
+              <% if joke.rejected? %>
+                <%= button_to "Delete", joke_path(joke, redirect_status: filter_status), method: :delete, class: "btn btn-danger", form_class: "action-form", data: { turbo_confirm: "Delete this joke permanently?" } %>
+              <% end %>
               <button type="button" class="btn btn-secondary joke-edit-button" data-action="joke-edit#edit">Edit</button>
             </div>
 

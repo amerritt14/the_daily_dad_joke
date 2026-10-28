@@ -1,9 +1,9 @@
 class JokesController < ApplicationController
   include RateLimiting
 
-  before_action :authenticate_user!, only: [ :index, :update ]
+  before_action :authenticate_user!, only: [ :index, :update, :destroy ]
   before_action :rate_limit_submission, only: [ :create ], unless: :user_signed_in?
-  before_action :joke, only: [ :update ]
+  before_action :joke, only: [ :update, :destroy ]
   layout "public", only: [ :new, :create ]
 
   def index
@@ -64,6 +64,17 @@ class JokesController < ApplicationController
       redirect_to redirect_path, notice: notice
     else
       redirect_to redirect_path, alert: @joke.errors.full_messages.to_sentence.presence || "Joke could not be updated."
+    end
+  end
+
+  def destroy
+    redirect_path = jokes_path(status: params[:redirect_status] || "rejected")
+
+    if @joke.rejected?
+      @joke.destroy
+      redirect_to redirect_path, notice: "Joke deleted."
+    else
+      redirect_to redirect_path, alert: "Only rejected jokes can be deleted."
     end
   end
 
