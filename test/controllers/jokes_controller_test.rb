@@ -233,24 +233,14 @@ class JokesControllerTest < ActionDispatch::IntegrationTest
       redirect_status: "pending"
     }
 
-    assert_response :unprocessable_entity
+    assert_redirected_to jokes_path(status: "pending")
+    assert_equal "Joke could not be updated.", flash[:alert]
   end
 
   test "should render inline edit form on each card" do
     sign_in @user
     get jokes_url(status: "pending")
     assert_select "[data-controller=joke-edit] form[hidden] textarea[name='joke[prompt]']"
-  end
-
-  test "should get edit when authenticated" do
-    sign_in @user
-    get edit_joke_url(@pending_joke)
-    assert_response :success
-  end
-
-  test "should redirect to sign in for edit when not authenticated" do
-    get edit_joke_url(@pending_joke)
-    assert_redirected_to new_user_session_path
   end
 
   test "should update joke text" do
@@ -268,10 +258,12 @@ class JokesControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Fixed punchline", @pending_joke.punchline
   end
 
-  test "should render edit with errors on invalid text update" do
+  test "should redirect with errors on invalid text update" do
     sign_in @user
     patch joke_url(@pending_joke), params: { joke: { prompt: "short" } }
-    assert_response :unprocessable_entity
+    assert_redirected_to jokes_path(status: "pending")
+    assert_match "Prompt is too short", flash[:alert]
+    assert_equal "pending", @pending_joke.reload.status
   end
 
   # Layout and Authentication Tests

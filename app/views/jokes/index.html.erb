@@ -111,6 +111,11 @@
                 <%= form.text_field :submitted_by, class: "joke-form-input", maxlength: 100 %>
               </div>
 
+              <div class="joke-form-group">
+                <%= form.label :status, class: "joke-form-label" %>
+                <%= form.select :status, Joke.statuses.keys.map { |s| [s.humanize, s] }, {}, class: "joke-form-input" %>
+              </div>
+
               <div class="joke-actions">
                 <%= form.submit "Save", class: "btn btn-success" %>
                 <button type="button" class="btn btn-secondary" data-action="joke-edit#cancel">Cancel</button>

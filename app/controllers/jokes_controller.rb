@@ -1,9 +1,9 @@
 class JokesController < ApplicationController
   include RateLimiting
 
-  before_action :authenticate_user!, only: [ :index, :edit, :update ]
+  before_action :authenticate_user!, only: [ :index, :update ]
   before_action :rate_limit_submission, only: [ :create ], unless: :user_signed_in?
-  before_action :joke, only: [ :edit, :update ]
+  before_action :joke, only: [ :update ]
   layout "public", only: [ :new, :create ]
 
   def index
@@ -56,16 +56,14 @@ class JokesController < ApplicationController
     end
   end
 
-  def edit
-    render locals: { joke: @joke }
-  end
-
   def update
+    redirect_path = jokes_path(status: params[:redirect_status] || "pending")
+
     if @joke.update(update_params)
       notice = @joke.status_previously_changed? ? "Joke status updated to #{@joke.status.humanize}." : "Joke updated."
-      redirect_to jokes_path(status: params[:redirect_status] || "pending"), notice: notice
+      redirect_to redirect_path, notice: notice
     else
-      render :edit, status: :unprocessable_entity, locals: { joke: @joke }
+      redirect_to redirect_path, alert: @joke.errors.full_messages.to_sentence.presence || "Joke could not be updated."
     end
   end
 
