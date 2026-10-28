@@ -1,15 +1,17 @@
 class JokesController < ApplicationController
   include RateLimiting
 
-  before_action :authenticate_user!, only: [ :index, :update ]
-  before_action :rate_limit_submission, only: [ :create ]
-  before_action :joke, only: [ :update ]
+  before_action :authenticate_user!, only: [ :index, :edit, :update ]
+  before_action :rate_limit_submission, only: [ :create ], unless: :user_signed_in?
+  before_action :joke, only: [ :edit, :update ]
   layout "public", only: [ :new, :create ]
 
   def index
     pending_count = Joke.pending.count
     approved_count = Joke.approved.count
     rejected_count = Joke.rejected.count
+    used_count = Joke.used.count
+    available_count = Joke.available.count
 
     # Apply pagination to filtered results
     jokes_list = jokes.paginate(page: params[:page], per_page: 12)
@@ -19,6 +21,8 @@ class JokesController < ApplicationController
       pending_count: pending_count,
       approved_count: approved_count,
       rejected_count: rejected_count,
+      used_count: used_count,
+      available_count: available_count,
       filter_status: filter_status
     }
   end
@@ -36,12 +40,14 @@ class JokesController < ApplicationController
     end
 
     joke = Joke.new(joke_params)
+    joke.status = :approved if user_signed_in?
 
     # reCAPTCHA verification
-    recaptcha_valid = verify_recaptcha(action: "submit_joke", minimum_score: 0.8)
+    recaptcha_valid = user_signed_in? || verify_recaptcha(action: "submit_joke", minimum_score: 0.8)
 
     if recaptcha_valid && joke.save
-      redirect_to new_joke_path, notice: "Thank you! Your joke has been submitted and is pending review."
+      notice = joke.approved? ? "Joke added and approved." : "Thank you! Your joke has been submitted and is pending review."
+      redirect_to new_joke_path, notice: notice
     else
       unless recaptcha_valid
         joke.errors.add(:base, "Security verification failed. Please try again.")
@@ -50,13 +56,16 @@ class JokesController < ApplicationController
     end
   end
 
+  def edit
+    render locals: { joke: @joke }
+  end
+
   def update
-    if @joke.update(status_params)
-      redirect_to jokes_path(status: params[:redirect_status] || "pending"),
-        notice: "Joke status updated to #{@joke.status.humanize}."
+    if @joke.update(update_params)
+      notice = @joke.status_previously_changed? ? "Joke status updated to #{@joke.status.humanize}." : "Joke updated."
+      redirect_to jokes_path(status: params[:redirect_status] || "pending"), notice: notice
     else
-      redirect_to jokes_path(status: params[:redirect_status] || "pending"),
-        alert: "Failed to update joke status."
+      render :edit, status: :unprocessable_entity, locals: { joke: @joke }
     end
   end
 
@@ -67,6 +76,8 @@ class JokesController < ApplicationController
 
     @jokes = if filter_status.in? Joke.statuses.keys
       Joke.where(status: filter_status)
+    elsif filter_status.in? %w[used available]
+      Joke.public_send(filter_status)
     else
       Joke.all.order(
         Arel.sql(
@@ -88,7 +99,7 @@ class JokesController < ApplicationController
     params.require(:joke).permit(:prompt, :punchline, :submitted_by)
   end
 
-  def status_params
-    params.require(:joke).permit(:status)
+  def update_params
+    params.require(:joke).permit(:status, :prompt, :punchline, :submitted_by)
   end
 end

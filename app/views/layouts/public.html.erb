@@ -18,8 +18,9 @@
 
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
-    <%# Google reCAPTCHA v3 API %>
-    <%= javascript_include_tag "https://www.google.com/recaptcha/api.js?render=#{Rails.application.credentials.dig(:recaptcha, :site_key) || '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'}", "data-turbo-track": "reload" %>
+    <% unless user_signed_in? %>
+      <%= javascript_include_tag "https://www.google.com/recaptcha/api.js?render=#{Rails.application.credentials.dig(:recaptcha, :site_key) || '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'}", "data-turbo-track": "reload" %>
+    <% end %>
     <%= javascript_importmap_tags %>
   </head>
 
@@ -31,7 +32,11 @@
         </h1>
 
         <nav class="site-nav">
-          <span class="nav-text">Share your best dad jokes with the world!</span>
+          <% if user_signed_in? %>
+            <%= link_to "Back to Dashboard", jokes_path, class: "btn btn-small btn-primary" %>
+          <% else %>
+            <span class="nav-text">Share your best dad jokes with the world!</span>
+          <% end %>
         </nav>
       </div>
     </header>

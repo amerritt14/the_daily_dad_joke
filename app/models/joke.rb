@@ -20,6 +20,9 @@ class Joke < ApplicationRecord
   enum :source, icanhazdadjoke: "icanhazdadjoke"
   enum :status, pending: "pending", approved: "approved", rejected: "rejected"
 
+  scope :used, -> { joins(:post) }
+  scope :available, -> { approved.where.missing(:post) }
+
   validates :prompt, presence: true, length: { minimum: 10, maximum: 500 }
   validates :punchline, length: { maximum: 500 }
   validates :submitted_by, length: { maximum: 100 }

@@ -35,6 +35,20 @@
           <p class="status-label status-label-rejected">Rejected</p>
         </div>
       <% end %>
+
+      <%= link_to jokes_path(status: 'available'), class: "status-card status-card-approved #{'status-card-active' if filter_status == 'available'}" do %>
+        <div class="status-content">
+          <p class="status-number status-number-approved"><%= available_count %></p>
+          <p class="status-label status-label-approved">Available to Post</p>
+        </div>
+      <% end %>
+
+      <%= link_to jokes_path(status: 'used'), class: "status-card #{'status-card-active' if filter_status == 'used'}" do %>
+        <div class="status-content">
+          <p class="status-number"><%= used_count %></p>
+          <p class="status-label">Used in Post</p>
+        </div>
+      <% end %>
     </div>
 
     <!-- Current Filter Heading -->
@@ -44,6 +58,8 @@
             when 'pending' then 'Pending Jokes'
             when 'approved' then 'Approved Jokes'
             when 'rejected' then 'Rejected Jokes'
+            when 'available' then 'Available Jokes'
+            when 'used' then 'Used Jokes'
             when 'all' then 'All Jokes'
             else 'Pending Jokes'
             end %>
@@ -53,7 +69,7 @@
     <% if jokes.any? %>
       <div class="jokes-grid">
         <% jokes.each do |joke| %>
-          <div class="joke-card <%= 'joke-card-pending' if joke.pending? %>">
+          <div class="joke-card <%= 'joke-card-pending' if joke.pending? %>" data-controller="joke-edit">
             <div class="joke-content">
               <div class="joke-header">
                 <span class="status-badge status-badge-<%= joke.status %>">
@@ -61,15 +77,48 @@
                 </span>
                 <small class="joke-date"><%= joke.created_at.strftime("%b %d, %Y") %></small>
               </div>
-              <h3 class="joke-question">Q: <%= joke.prompt %></h3>
-              <p class="joke-answer">A: <%= joke.punchline %></p>
-              <% if joke.submitted_by.present? %>
-                <p class="joke-submitter">Submitted by: <%= joke.submitted_by %></p>
-              <% end %>
+
+              <div data-joke-edit-target="view">
+                <h3 class="joke-question">Q: <%= joke.prompt %></h3>
+                <p class="joke-answer">A: <%= joke.punchline %></p>
+                <% if joke.submitted_by.present? %>
+                  <p class="joke-submitter">Submitted by: <%= joke.submitted_by %></p>
+                <% end %>
+              </div>
             </div>
 
-            <% if joke.pending? %>
+            <% if joke.source.present? %>
+              <div class="joke-source">
+                Source: <%= joke.source %>
+              </div>
+            <% end %>
+
+            <%= form_with model: joke, local: true, namespace: dom_id(joke), html: { hidden: true }, data: { joke_edit_target: "edit form" } do |form| %>
+              <%= hidden_field_tag :redirect_status, filter_status, id: nil %>
+
+              <div class="joke-form-group">
+                <%= form.label :prompt, "Setup/Prompt", class: "joke-form-label" %>
+                <%= form.text_area :prompt, class: "joke-form-textarea", rows: 3 %>
+              </div>
+
+              <div class="joke-form-group">
+                <%= form.label :punchline, "Punchline", class: "joke-form-label" %>
+                <%= form.text_area :punchline, class: "joke-form-textarea", rows: 3 %>
+              </div>
+
+              <div class="joke-form-group">
+                <%= form.label :submitted_by, "Submitted By", class: "joke-form-label" %>
+                <%= form.text_field :submitted_by, class: "joke-form-input", maxlength: 100 %>
+              </div>
+
               <div class="joke-actions">
+                <%= form.submit "Save", class: "btn btn-success" %>
+                <button type="button" class="btn btn-secondary" data-action="joke-edit#cancel">Cancel</button>
+              </div>
+            <% end %>
+
+            <div class="joke-actions" data-joke-edit-target="view">
+              <% if joke.pending? %>
                 <%= form_with model: joke, method: :patch, local: true, class: "action-form" do |form| %>
                   <%= form.hidden_field :status, value: "approved" %>
                   <%= form.hidden_field :redirect_status, value: filter_status %>
@@ -81,14 +130,10 @@
                   <%= form.hidden_field :redirect_status, value: filter_status %>
                   <%= form.submit "Reject", class: "btn btn-danger" %>
                 <% end %>
-              </div>
-            <% end %>
+              <% end %>
+              <button type="button" class="btn btn-secondary joke-edit-button" data-action="joke-edit#edit">Edit</button>
+            </div>
 
-            <% if joke.source.present? %>
-              <div class="joke-source">
-                Source: <%= joke.source %>
-              </div>
-            <% end %>
           </div>
         <% end %>
       </div>
@@ -124,6 +169,8 @@
                 when 'pending' then "There are no jokes waiting for review."
                 when 'approved' then "No jokes have been approved yet."
                 when 'rejected' then "No jokes have been rejected."
+                when 'available' then "No approved jokes are left to post."
+                when 'used' then "No jokes have been used in a post yet."
                 when 'all' then "No jokes have been submitted yet."
                 else "There are no jokes to display."
                 end %>

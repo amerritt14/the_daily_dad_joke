@@ -62,9 +62,11 @@
           <%= form.text_field :website, tabindex: -1, autocomplete: "off" %>
         </div>
 
-        <div data-controller="recaptcha">
-          <%= recaptcha_v3(action: 'submit_joke') %>
-        </div>
+        <% unless user_signed_in? %>
+          <div data-controller="recaptcha">
+            <%= recaptcha_v3(action: 'submit_joke') %>
+          </div>
+        <% end %>
 
         <div class="joke-form-submit-group">
           <%= form.submit "Submit Joke", class: "joke-form-submit-button" %>

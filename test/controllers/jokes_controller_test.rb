@@ -50,6 +50,18 @@ class JokesControllerTest < ActionDispatch::IntegrationTest
     assert_select "h2", text: "All Jokes"
   end
 
+  test "should filter by used and available jokes" do
+    sign_in @user
+
+    get jokes_url(status: "used")
+    assert_response :success
+    assert_match @approved_joke.prompt, response.body
+
+    get jokes_url(status: "available")
+    assert_response :success
+    assert_no_match @approved_joke.prompt, response.body
+  end
+
   test "should display status counts" do
     sign_in @user
     get jokes_url
@@ -159,6 +171,16 @@ class JokesControllerTest < ActionDispatch::IntegrationTest
     assert_select ".bg-red-50" # Error message container
   end
 
+  test "should create joke without reCAPTCHA when signed in" do
+    sign_in @user
+    JokesController.any_instance.expects(:verify_recaptcha).never
+
+    assert_difference("Joke.count") do
+      post jokes_url, params: { joke: { prompt: "Admin added this joke prompt" } }
+    end
+    assert Joke.last.approved?
+  end
+
   test "should use rate limiting on create" do
     # This test verifies that rate limiting is applied
     # The actual rate limiting logic is tested in the concern
@@ -211,26 +233,45 @@ class JokesControllerTest < ActionDispatch::IntegrationTest
       redirect_status: "pending"
     }
 
-    assert_redirected_to jokes_path(status: "pending")
-    assert_equal "Failed to update joke status.", flash[:alert]
+    assert_response :unprocessable_entity
   end
 
-  test "should only allow status parameter in update" do
+  test "should render inline edit form on each card" do
+    sign_in @user
+    get jokes_url(status: "pending")
+    assert_select "[data-controller=joke-edit] form[hidden] textarea[name='joke[prompt]']"
+  end
+
+  test "should get edit when authenticated" do
+    sign_in @user
+    get edit_joke_url(@pending_joke)
+    assert_response :success
+  end
+
+  test "should redirect to sign in for edit when not authenticated" do
+    get edit_joke_url(@pending_joke)
+    assert_redirected_to new_user_session_path
+  end
+
+  test "should update joke text" do
     sign_in @user
 
-    original_prompt = @pending_joke.prompt
-
     patch joke_url(@pending_joke), params: {
-      joke: {
-        status: "approved",
-        prompt: "Hacked prompt", # Should be ignored
-        punchline: "Hacked punchline" # Should be ignored
-      }
+      joke: { prompt: "Fixed typo in this prompt", punchline: "Fixed punchline" },
+      redirect_status: "pending"
     }
 
+    assert_redirected_to jokes_path(status: "pending")
+    assert_equal "Joke updated.", flash[:notice]
     @pending_joke.reload
-    assert_equal "approved", @pending_joke.status
-    assert_equal original_prompt, @pending_joke.prompt # Should be unchanged
+    assert_equal "Fixed typo in this prompt", @pending_joke.prompt
+    assert_equal "Fixed punchline", @pending_joke.punchline
+  end
+
+  test "should render edit with errors on invalid text update" do
+    sign_in @user
+    patch joke_url(@pending_joke), params: { joke: { prompt: "short" } }
+    assert_response :unprocessable_entity
   end
 
   # Layout and Authentication Tests

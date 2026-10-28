@@ -135,6 +135,10 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 1.5rem;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 /* Status Grid */
 .status-grid {
   display: grid;
@@ -145,7 +149,7 @@ h1, h2, h3, h4, h5, h6 {
 
 @media (min-width: 768px) {
   .status-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
@@ -258,6 +262,8 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   padding: 1.5rem;
   transition: box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
 }
 
 .joke-card:hover {
@@ -333,6 +339,14 @@ h1, h2, h3, h4, h5, h6 {
   margin-top: 1rem;
   padding-top: 1rem;
   border-top: 1px solid #6b747a;
+}
+
+.joke-card > .joke-actions {
+  margin-top: auto;
+}
+
+.joke-edit-button {
+  margin-left: auto;
 }
 
 .action-form {
@@ -429,6 +443,16 @@ h1, h2, h3, h4, h5, h6 {
 
 .btn-success:hover {
   background-color: #239B94;
+}
+
+.btn-secondary {
+  background-color: #ffffff;
+  color: #2E2E2E;
+  border: 1px solid #6b747a;
+}
+
+.btn-secondary:hover {
+  background-color: #f3f4f6;
 }
 
 .btn-danger {
